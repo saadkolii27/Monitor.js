@@ -1,10 +1,6 @@
-const { chromium } = require("playwright");
-const nodemailer = require("nodemailer");
-const fs = require("fs");
-const path = require("path");
-
 console.log("🔹 monitor2.js started");
 
+// Check env variables
 const username = process.env.UNIVH2C_USERNAME;
 const password = process.env.UNIVH2C_PASSWORD;
 const emailUser = process.env.EMAIL_USER;
@@ -18,19 +14,22 @@ if (!username || !password || !emailUser || !emailPass || !emailTo) {
     process.exit(1);
 }
 
+// Async IIFE
 (async () => {
+    const { chromium } = require("playwright");
+    const nodemailer = require("nodemailer");
+    const fs = require("fs");
+    const path = require("path");
+
     console.log("🔹 Launching browser...");
     const browser = await chromium.launch({ headless: false });
     const page = await browser.newPage();
-    page.setDefaultTimeout(180000);
-    page.setDefaultNavigationTimeout(180000);
 
     try {
         console.log("🔹 Going to login page...");
         await page.goto("https://auth.univh2c.ma/cas5/login?service=https%3A%2F%2Fentv26.univh2c.ma%2FdossierPedago%2Flogin");
         console.log("🔹 Login page loaded");
 
-        // Fill login form (adjust selectors)
         await page.fill("input[name='username']", username);
         await page.fill("input[name='password']", password);
         await page.click("button[type='submit']");
@@ -38,7 +37,7 @@ if (!username || !password || !emailUser || !emailPass || !emailTo) {
         console.log("✅ Logged in / waiting for grades page...");
 
         await page.goto("https://entv26.univh2c.ma/dossierPedago/notes");
-        await page.waitForSelector("body"); // or a more specific selector
+        await page.waitForSelector("body");
         console.log("✅ Grades page loaded");
 
         const resultsText = await page.locator("body").innerText();
