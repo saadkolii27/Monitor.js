@@ -1,4 +1,4 @@
-console.log("🔹 monitor2.js started");
+.log("🔹 monitor2.js started");
 
 // Check env variables
 const username = process.env.UNIVH2C_USERNAME;
