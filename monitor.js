@@ -4,7 +4,6 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 
 (async () => {
-  // ===== ENV VARIABLES =====
   const username = process.env.ETALIB_USERNAME;
   const password = process.env.ETALIB_PASSWORD;
   const emailUser = process.env.EMAIL_USER;
@@ -12,7 +11,7 @@ const path = require("path");
   const emailTo = process.env.EMAIL_TO;
 
   if (!username || !password || !emailUser || !emailPass || !emailTo) {
-    console.log("❌ Missing environment variables. Set ETALIB_USERNAME, ETALIB_PASSWORD, EMAIL_USER, EMAIL_PASS, EMAIL_TO");
+    console.log("❌ Missing environment variables.");
     process.exit(1);
   }
 
@@ -31,25 +30,23 @@ const path = require("path");
     await page.fill("input[name='j_password']", password);
     await page.click("button[type='submit']");
     await page.waitForLoadState("networkidle");
-    console.log("✅ Login submitted. Waiting for results page...");
+    console.log("✅ Login submitted.");
 
     // ===== RESULTS PAGE =====
     await page.goto("https://etalib.fdc.ma/etalib/ent/resultat");
     const selector = "div.content-wrapper div.content";
     await page.waitForSelector(selector);
-    console.log("✅ Results page loaded");
-
-    // ===== EXTRACT RESULTS =====
     const resultsText = await page.locator(selector).innerText();
+
     const resultsFile = path.join(__dirname, "results.txt");
     const previousResults = fs.existsSync(resultsFile) ? fs.readFileSync(resultsFile, "utf8") : "";
     const newLines = resultsText.split("\n").filter(line => !previousResults.includes(line)).filter(line => line.trim() !== "");
 
-    // ===== TAKE SCREENSHOT =====
+    // ===== SCREENSHOT =====
     const screenshotPath = path.join(__dirname, "latest_result.png");
     await page.screenshot({ path: screenshotPath, fullPage: true });
 
-    // ===== SEND EMAIL IF NEW RESULTS =====
+    // ===== SEND EMAIL =====
     if (newLines.length > 0) {
       console.log(`⚠️ ${newLines.length} new grade(s) detected`);
 
@@ -66,8 +63,6 @@ const path = require("path");
             ${newLines.map(line => `<li>${line}</li>`).join("")}
           </ul>
           <p><a href='https://etalib.fdc.ma/etalib/ent/resultat'>Open Etalib Portal</a></p>
-          <hr>
-          <small>University Monitor</small>
         </div>
       `;
 
@@ -87,7 +82,7 @@ const path = require("path");
     // ===== SAVE RESULTS =====
     fs.writeFileSync(resultsFile, resultsText);
 
-    // ===== LOG CHECK =====
+    // ===== LOG =====
     const logPath = path.join(__dirname, "monitor.log");
     const logLine = newLines.length > 0
       ? `${timestamp} → ${newLines.length} new grades`
@@ -98,6 +93,6 @@ const path = require("path");
     console.log("❌ Error during monitoring:", err);
   } finally {
     await browser.close();
-    console.log("✅ Browser closed. Monitor finished.");
+    console.log("✅ Browser closed.");
   }
 })();
