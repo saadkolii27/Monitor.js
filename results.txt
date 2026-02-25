@@ -1,0 +1,16 @@
+Code Apogée : 24001110	CYCLE Licence - Etape : 2ème Année Gestion
+Nom : KOLII	Prénom : SAAD	CIN : BK760265	CNE : R130111962
+
+
+
+Aprés la consultation des notes avant délibération , vous avez un délais de 48 Heures pour déposer une réclamation sur le présent site
+
+S3 Gestion	Réclamation	Réponse
+N° Module	Elément de module	Note SS1	Note SS2	Note finale	Appréciation	Note trouvée	Réponse
+HLGE3105	Comptabilité analytique de gestion							
+HLGE3205	Economie du Maroc					 00 Jours 03:29:44  Réclamer		
+HLGE3305	Management des organisations							
+HLGE3405	Probabilité	7.0			RAT			
+HLGE3505	Droit de l entreprise							
+HLGE3605	Sociologie des organisations							
+HLGE3705	Français					 00 Jours 03:36:14  Réclamer		
