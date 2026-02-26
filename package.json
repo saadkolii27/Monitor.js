@@ -4,7 +4,8 @@
   "description": "Automated Etalib results monitoring system",
   "main": "monitor.js",
   "scripts": {
-    "start": "node monitor.js"
+    "start": "node monitor.js",
+    "postinstall": "npx playwright install chromium"
   },
   "dependencies": {
     "nodemailer": "^6.9.13",
