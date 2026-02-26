@@ -36,14 +36,14 @@ jobs:
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
 
-      - name: Run UH2C monitor
-        run: node monitor2.js
-        env:
-          UH2_USERNAME: ${{ secrets.UH2_USERNAME }}
-          UH2_PASSWORD: ${{ secrets.UH2_PASSWORD }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+     # - name: Run UH2C monitor
+      #  run: node monitor2.js
+     #   env:
+        #  UH2_USERNAME: ${{ secrets.UH2_USERNAME }}
+        #  UH2_PASSWORD: ${{ secrets.UH2_PASSWORD }}
+       #   EMAIL_USER: ${{ secrets.EMAIL_USER }}
+        #  EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+      #    EMAIL_TO: ${{ secrets.EMAIL_TO }}
 
       - name: Commit results
         run: |
