@@ -2,7 +2,7 @@ name: University Monitors
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # runs every 5 minutes (minimum reliable)
+    - cron: '*/5 * * * *' # runs every 5 minutes (minimum reliable)
   workflow_dispatch:       # allows manual run
 
 jobs:
