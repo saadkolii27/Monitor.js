@@ -1,4 +1,7 @@
-const { chromium } = require("playwright");
+const browser = await chromium.launch({
+  headless: true,
+  args: ["--no-sandbox", "--disable-setuid-sandbox"]
+});
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 
