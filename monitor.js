@@ -1,12 +1,14 @@
-const browser = await chromium.launch({
-  headless: true,
-  args: ["--no-sandbox", "--disable-setuid-sandbox"]
-});
-const fs = require("fs");
-const nodemailer = require("nodemailer");
-const path = require("path");
+ import { chromium } from "playwright";
+import fs from "fs";
+import nodemailer from "nodemailer";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 (async () => {
+
   const username = process.env.ETALIB_USERNAME;
   const password = process.env.ETALIB_PASSWORD;
   const emailUser = process.env.EMAIL_USER;
@@ -18,16 +20,21 @@ const path = require("path");
     process.exit(1);
   }
 
-  const timestamp = new Date().toISOString().replace("T", " ").split(".")[0];
+  const timestamp = new Date().toISOString().replace("T"," ").split(".")[0];
   console.log(`[${timestamp}] Starting University Monitor...`);
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+  });
+
   const page = await browser.newPage();
   page.setDefaultTimeout(180000);
   page.setDefaultNavigationTimeout(180000);
 
   try {
-    // ===== LOGIN =====
+
+    // LOGIN
     await page.goto("https://etalib.fdc.ma/etalib/login");
     await page.fill("input[name='j_username']", username);
     await page.fill("input[name='j_password']", password);
@@ -35,27 +42,46 @@ const path = require("path");
     await page.waitForLoadState("networkidle");
     console.log("✅ Login submitted.");
 
-    // ===== RESULTS PAGE =====
+    // RESULTS
     await page.goto("https://etalib.fdc.ma/etalib/ent/resultat");
+
     const selector = "div.content-wrapper div.content";
     await page.waitForSelector(selector);
+
     const resultsText = await page.locator(selector).innerText();
 
-    const resultsFile = path.join(__dirname, "results.txt");
-    const previousResults = fs.existsSync(resultsFile) ? fs.readFileSync(resultsFile, "utf8") : "";
-    const newLines = resultsText.split("\n").filter(line => !previousResults.includes(line)).filter(line => line.trim() !== "");
+    const resultsFile = path.join(__dirname,"results.txt");
 
-    // ===== SCREENSHOT =====
-    const screenshotPath = path.join(__dirname, "latest_result.png");
-    await page.screenshot({ path: screenshotPath, fullPage: true });
+    const previousResults =
+      fs.existsSync(resultsFile)
+      ? fs.readFileSync(resultsFile,"utf8")
+      : "";
 
-    // ===== SEND EMAIL =====
+    const newLines =
+      resultsText
+      .split("\n")
+      .filter(line => !previousResults.includes(line))
+      .filter(line => line.trim() !== "");
+
+    // SCREENSHOT
+    const screenshotPath = path.join(__dirname,"latest_result.png");
+
+    await page.screenshot({
+      path: screenshotPath,
+      fullPage: true
+    });
+
+    // EMAIL
     if (newLines.length > 0) {
+
       console.log(`⚠️ ${newLines.length} new grade(s) detected`);
 
       const transporter = nodemailer.createTransport({
         service: "gmail",
-        auth: { user: emailUser, pass: emailPass }
+        auth: {
+          user: emailUser,
+          pass: emailPass
+        }
       });
 
       const htmlContent = `
@@ -65,7 +91,11 @@ const path = require("path");
           <ul>
             ${newLines.map(line => `<li>${line}</li>`).join("")}
           </ul>
-          <p><a href='https://etalib.fdc.ma/etalib/ent/resultat'>Open Etalib Portal</a></p>
+          <p>
+            <a href="https://etalib.fdc.ma/etalib/ent/resultat">
+            Open Etalib Portal
+            </a>
+          </p>
         </div>
       `;
 
@@ -74,22 +104,28 @@ const path = require("path");
         to: emailTo,
         subject: "📸 Etalib Results Updated",
         html: htmlContent,
-        attachments: [{ filename: "results.png", path: screenshotPath }]
+        attachments: [
+          { filename: "results.png", path: screenshotPath }
+        ]
       });
 
       console.log("✅ Email sent");
+
     } else {
       console.log("No new grades detected");
     }
 
-    // ===== SAVE RESULTS =====
+    // SAVE RESULTS
     fs.writeFileSync(resultsFile, resultsText);
 
-    // ===== LOG =====
-    const logPath = path.join(__dirname, "monitor.log");
-    const logLine = newLines.length > 0
+    // LOG
+    const logPath = path.join(__dirname,"monitor.log");
+
+    const logLine =
+      newLines.length > 0
       ? `${timestamp} → ${newLines.length} new grades`
       : `${timestamp} → checked → no change`;
+
     fs.appendFileSync(logPath, logLine + "\n");
 
   } catch (err) {
@@ -98,4 +134,5 @@ const path = require("path");
     await browser.close();
     console.log("✅ Browser closed.");
   }
+
 })();
