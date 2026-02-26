@@ -1,22 +1,21 @@
-name: Etalib Results Monitor
+name: University Monitors
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+    - cron: "*/5 * * * *" # runs every 5 minutes (minimum reliable)
+  workflow_dispatch:       # allows manual run
 
 jobs:
   monitor:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -27,23 +26,29 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run monitor script
+      - name: Run Etalib monitor
+        run: node monitor.js
         env:
           ETALIB_USERNAME: ${{ secrets.ETALIB_USERNAME }}
           ETALIB_PASSWORD: ${{ secrets.ETALIB_PASSWORD }}
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
-        run: node monitor.js
 
-      - name: Commit and push updated files
+      - name: Run UH2C monitor
+        run: node monitor2.js
+        env:
+          UH2_USERNAME: ${{ secrets.UH2_USERNAME }}
+          UH2_PASSWORD: ${{ secrets.UH2_PASSWORD }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+
+      - name: Commit results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          for f in results.txt latest_result.png monitor.log; do
-            [ -f "$f" ] && git add "$f"
-          done
-
-          git diff --cached --quiet || git commit -m "chore: update monitoring results [skip ci]"
+          git add results*.txt *.png *.log || true
+          git diff --cached --quiet || git commit -m "update monitoring results [skip ci]"
           git push
