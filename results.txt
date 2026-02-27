@@ -7,10 +7,10 @@ Aprés la consultation des notes avant délibération , vous avez un délais de 
 
 S3 Gestion	Réclamation	Réponse
 N° Module	Elément de module	Note SS1	Note SS2	Note finale	Appréciation	Note trouvée	Réponse
-HLGE3105	Comptabilité analytique de gestion							
+HLGE3105	Comptabilité analytique de gestion	6.75			RAT			
 HLGE3205	Economie du Maroc	11.5			MV	Enregistré		
-HLGE3305	Management des organisations							
+HLGE3305	Management des organisations	14.0			MV			
 HLGE3405	Probabilité	7.0			RAT			
-HLGE3505	Droit de l entreprise							
-HLGE3605	Sociologie des organisations							
+HLGE3505	Droit de l entreprise	10.0			MV			
+HLGE3605	Sociologie des organisations	10.5			MV			
 HLGE3705	Français	11.75			MV	Enregistré		
